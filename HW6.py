@@ -3,23 +3,40 @@ import numpy.linalg as linalg
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import math
-
-
-
-
-
-
-
-
-
+import random as rand
 
 
 
 def main():
 	global xsignal
 	xsignal = np.loadtxt('./xsignal.csv', delimiter=',')
-	A = generateBlurMatrix(6, 3)
-	print(A)
+	xsignal = xsignal.reshape((xsignal.size, 1))
+
+	b0 = partb(xsignal, 0.01)
+	b1 = partb(xsignal, 0.1)
+
+def partc():
+	pass
+
+def partb(xsignal, msigma, plot=False):
+	# Part b
+	A = generateBlurMatrix(xsignal.shape[0], 30)
+	w = np.ones((xsignal.shape[0], 1))
+	for wi in range(0, w.shape[0]):
+		w[wi] *= rand.normalvariate(0, sigma=msigma)
+	# Calculate the blur.
+	b = A.dot(xsignal) + w
+	# Plots for msigma = 0.01 and 0.1.
+	if plot:
+		plt.plot(list(range(0, b.shape[0])), b, color='r')
+		plt.plot(list(range(0, xsignal.shape[0])), xsignal, color='b')
+		plt.xlabel('index')
+		plt.ylabel('value')
+		plt.title('Signal and Blurred Signal Plots, sigma=0.01')
+		plt.show()
+
+	return b
+
 
 
 '''
