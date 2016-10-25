@@ -17,11 +17,11 @@ def main():
 	A = generateBlurMatrix(xsignal.shape[0], 30)
 	# Part b
 	b0 = partb(xsignal, A, 0.01)
-	b1 = partb(xsignal, A, 0.1)
+	b1 = partb(xsignal, A, .1)
 
 	# Part c
-	partc(xsignal, A, b0, cond_num=.5, lambd=.2)
-	partc(xsignal, A, b1, cond_num=.5, lambd=.25)
+	partc(xsignal, A, b0, cond_num=.2, lambd=.2)
+	partc(xsignal, A, b1, cond_num=.25, lambd=.25)
 
 
 def partc(xsignal, A, b, cond_num, lambd, plot=True):
