@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import math
 import random as rand
+import scipy as sp
 
 
 
@@ -19,11 +20,11 @@ def main():
 	b1 = partb(xsignal, A, 0.1)
 
 	# Part c
-	partc(xsignal, A, b0, msing=500, lambd=.2)
-	partc(xsignal, A, b1, msing=500, lambd=.25)
+	partc(xsignal, A, b0, cond_num=.5, lambd=.2)
+	partc(xsignal, A, b1, cond_num=.5, lambd=.25)
 
 
-def partc(xsignal, A, b, msing, lambd, plot=True):
+def partc(xsignal, A, b, cond_num, lambd, plot=True):
 	xLS = 0
 	xSVDLS = 0
 	xLSReg = 0
@@ -31,10 +32,13 @@ def partc(xsignal, A, b, msing, lambd, plot=True):
 	# Least Squares Solution.
 	xLS = np.linalg.inv(A.T.dot(A)).dot(A.T).dot(b)
 	# SVD Reduced Least Squares Solution.
-	U, S, V = np.linalg.svd(A)
-	Sr = np.diag(S[:msing])
-	redA = U[:, :msing].dot(Sr).dot(V[:msing, :])#U.dot(np.diag(S)).dot(V)#
-	xSVDLS = np.linalg.inv(redA.T.dot(redA)).dot(redA.T).dot(b)
+	U, S, V = np.linalg.svd(A, full_matrices=False)
+	#Sr = np.diag(S[:msing])
+	#redA = U[:, :200].dot(np.diag(S)[:200, :200]).dot(V[:200, :])
+	#redA = U[:, :msing].dot(Sr).dot(V[:msing, :])#U.dot(np.diag(S)).dot(V)#
+
+	xSVDLS = np.linalg.lstsq(A, b, rcond=cond_num)[0]
+	#xSVDLS = np.linalg.inv(redA.T.dot(redA)).dot(redA.T).dot(b)
 	# Least Squares with Tikhonov Regularization.
 	B = A.T.dot(A) + (lambd*np.eye(xsignal.shape[0]))
 	xLSReg = np.linalg.inv(B).dot(A.T).dot(b)
@@ -69,9 +73,6 @@ def partc(xsignal, A, b, msing, lambd, plot=True):
 		plt.xlabel('data index')
 		plt.ylabel('value')
 		plt.show()
-
-
-
 
 def partb(xsignal, A, msigma, plot=False):
 	# Part b
