@@ -14,31 +14,30 @@ def main():
 	xsignal = xsignal.reshape((xsignal.size, 1))
 
 	# Part a
-	A = generateBlurMatrix(xsignal.shape[0], 30)
+	A = generateBlurMatrix(xsignal.shape[0], 320)
 	# Part b
 	b0 = partb(xsignal, A, 0.01)
 	b1 = partb(xsignal, A, .1)
 
 	# Part c
-	partc(xsignal, A, b0, cond_num=.2, lambd=.2)
-	partc(xsignal, A, b1, cond_num=.25, lambd=.25)
+	partc(xsignal, A, b0, msing=30, lambd=.01)
+	partc(xsignal, A, b1, msing=20, lambd=.05)
 
 
-def partc(xsignal, A, b, cond_num, lambd, plot=True):
+def partc(xsignal, A, b, msing, lambd, plot=True):
 	xLS = 0
 	xSVDLS = 0
 	xLSReg = 0
 
 	# Least Squares Solution.
-	xLS = np.linalg.inv(A.T.dot(A)).dot(A.T).dot(b)
-	# SVD Reduced Least Squares Solution.
 	U, S, V = np.linalg.svd(A, full_matrices=False)
-	#Sr = np.diag(S[:msing])
-	#redA = U[:, :200].dot(np.diag(S)[:200, :200]).dot(V[:200, :])
-	#redA = U[:, :msing].dot(Sr).dot(V[:msing, :])#U.dot(np.diag(S)).dot(V)#
+	xLS = V.T.dot(np.linalg.inv(np.diag(S))).dot(U.T).dot(b)#np.linalg.inv(A.T.dot(A)).dot(A.T).dot(b)
 
-	xSVDLS = np.linalg.lstsq(A, b, rcond=cond_num)[0]
-	#xSVDLS = np.linalg.inv(redA.T.dot(redA)).dot(redA.T).dot(b)
+	# SVD Reduced Least Squares Solution.
+	Sr = np.diag(S[:msing])
+	# Use the pseudo inverse equation from the reduced matrix and calculate the corresponding x.
+	xSVDLS = V.T[:, :msing].dot(np.linalg.inv(Sr)).dot(U.T[:msing, :]).dot(b)
+
 	# Least Squares with Tikhonov Regularization.
 	B = A.T.dot(A) + (lambd*np.eye(xsignal.shape[0]))
 	xLSReg = np.linalg.inv(B).dot(A.T).dot(b)
