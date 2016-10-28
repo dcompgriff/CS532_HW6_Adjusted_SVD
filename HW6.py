@@ -14,14 +14,14 @@ def main():
 	xsignal = xsignal.reshape((xsignal.size, 1))
 
 	# Part a
-	A = generateBlurMatrix(xsignal.shape[0], 320)
+	A = generateBlurMatrix(xsignal.shape[0], 150)
 	# Part b
-	b0 = partb(xsignal, A, 0.01)
-	b1 = partb(xsignal, A, .1)
+	b0 = partb(xsignal, A, .01, plot=False)
+	b1 = partb(xsignal, A, .1, plot=False)
 
 	# Part c
-	partc(xsignal, A, b0, msing=30, lambd=.01)
-	partc(xsignal, A, b1, msing=20, lambd=.05)
+	partc(xsignal, A, b0, msing=25, lambd=.002)
+	#partc(xsignal, A, b1, msing=20, lambd=.05)
 
 
 def partc(xsignal, A, b, msing, lambd, plot=True):
@@ -84,9 +84,12 @@ def partb(xsignal, A, msigma, plot=False):
 	if plot:
 		plt.plot(list(range(0, b.shape[0])), b, color='r')
 		plt.plot(list(range(0, xsignal.shape[0])), xsignal, color='b')
+		blue_patch = mpatches.Patch(color='b', label='xsignal')
+		red_patch = mpatches.Patch(color='r', label='blurred signal')
+		plt.legend(handles=[blue_patch, red_patch])
 		plt.xlabel('index')
 		plt.ylabel('value')
-		plt.title('Signal and Blurred Signal Plots, sigma=0.01')
+		plt.title('Signal and Blurred Signal Plots, sigma=%s' % str(msigma))
 		plt.show()
 
 	return b
